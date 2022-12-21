@@ -6,7 +6,6 @@ const DEFAULT_OPTION = {
   maxLines: 3,
   fields: ["id", "name", "profession", "age"],
 };
-
 class File {
   static async csvToJson(filePath) {
     const content = await File.getFileContent(filePath);
@@ -21,9 +20,9 @@ class File {
     return (await readFile(filePath)).toString("utf8");
   }
   static isValid(csvString, options = DEFAULT_OPTION) {
-    const [header, ...fileWithoutHeader] = csvString.split("\r");
+    // UPDATE 03/11/2022 - adicionada regra para suportar quebra de linha (\r\n) do Windows
+    const [header, ...fileWithoutHeader] = csvString.split(/\r?\n/);
     const isHeaderValid = header === options.fields.join(",");
-
     if (!isHeaderValid) {
       return {
         error: error.FILE_FIELDS_ERROR_MESSAGE,
@@ -33,7 +32,6 @@ class File {
 
     const isContentLengthAccepted =
       fileWithoutHeader.length > 0 && fileWithoutHeader.length <= options.maxLines;
-
     if (!isContentLengthAccepted) {
       return {
         error: error.FILE_LENGTH_ERROR_MESSAGE,
